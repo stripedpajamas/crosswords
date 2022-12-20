@@ -39,12 +39,11 @@
 
   .blank {}
 
-  .selected {
-    background-color: lightskyblue;
+  .inSelectedWord.selected {
+    background-color: rgba(135, 206, 250);
   }
 
   .inSelectedWord {
-    background-color: rgba(135, 206, 250, 0.5);
-
+    background-color: rgba(135, 206, 250, 0.4);
   }
 </style>

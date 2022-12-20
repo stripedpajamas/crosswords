@@ -70,8 +70,12 @@
     if (!idxInBounds(tileIdx) || isFiller(puzzle[tileIdx])) {
       return;
     }
+    selectedWordTileIdxs = getWordBoundaryIdxs(tileIdx);
+    if (selectedWordTileIdxs.size <= 1) {
+      toggleClueDirection();
+      selectedWordTileIdxs = getWordBoundaryIdxs(tileIdx);
+    }
     selectedTileIdx = tileIdx;
-    selectedWordTileIdxs = getWordBoundaryIdxs(selectedTileIdx);
     tileElements[tileIdx].focus();
   }
 
