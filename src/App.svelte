@@ -70,6 +70,9 @@
     if (!idxInBounds(tileIdx) || isFiller(puzzle[tileIdx])) {
       return;
     }
+    if (tileIdx === selectedTileIdx) {
+      toggleClueDirection();
+    }
     selectedWordTileIdxs = getWordBoundaryIdxs(tileIdx);
     if (selectedWordTileIdxs.size <= 1) {
       toggleClueDirection();
