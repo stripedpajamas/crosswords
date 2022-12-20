@@ -2,9 +2,16 @@
   import type { ParsedPuz } from './global';
   import Tile from './components/Tile.svelte';
 
-  const examplePuz: ParsedPuz = {
+  enum Direction {
+    Across,
+    Down,
+  }
+
+  // TODO probably fetch a parsedpuz object from backend based on current url
+  // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
+  let puzzle: ParsedPuz = {
     solution: '.H.P.F...A.T.F.MONOPOLY.CARBON.N.L.R.E.T.A.U.CONE.TALLORDERS.R...R.L.R.E.T.ASPIRE.OBSERVER...N.S.W...O.E..GUESS.B.MOURN..R.B...E.E.T...REPRISAL.TREATY.E.I.A.L.H...O.ANTARCTICA.DOWN.E.T.R.E.N.O.A.FREEZE.DROLLERY.Y.D.D...L.E.D.',
-    state: '.-.-.-...-.-.-.--------.------.-.-.-.-.-.-.-.----.----------.-...-.-.-.-.-.------.--------...-.-.-...-.-..-----.-.-----..-.-...-.-.-...--------.------.-.-.-.-.-...-.----------.----.-.-.-.-.-.-.-.------.--------.-.-.-...-.-.-.',
+    state: '.-.-.-...-.-.-.--------.------.-.-.-.-.-.-.-.----.----------.-...-.-.-.-.-.------.--------...-.-.-...-.-..-----.-.-----..-.-...-.-.-...--------.------.-.-.-.-.-...-.----------.----.-.-.-.-.-.-.-.------.--------.-.-.-...-.-.-.'.split(''),
     title: 'cru cryptic 229',
     author: 'Dan Chall',
     copyright: 'Dan ©hall',
@@ -40,12 +47,70 @@
       'Sitcom actress in dry humor (8)'
     ],
   }
+
+  let selectedTileIdx = 0;
+  let clueDirection = Direction.Across
+
+  function isAlpha(value: string): boolean {
+    return value >= 'A' && value <= 'Z';
+  }
+
+  function handleTileUpdate(tileIdx: number, value: string): void {
+    if (!isAlpha(value)) {
+      return;
+    }
+
+    puzzle.state[tileIdx] = value;
+    puzzle = puzzle;
+  }
+
+  function handleTileClick(tileIdx: number): void {
+    if (isFiller(puzzle.state[tileIdx])) {
+      return;
+    }
+    selectedTileIdx = tileIdx;
+  }
+
+  function handleTileKey(tileIdx: number, event: KeyboardEvent): void {
+    const key = event.key.toUpperCase();
+    if (key.length === 1 && isAlpha(key)) {
+      puzzle.state[tileIdx] = key;
+    }
+
+    switch (key) {
+      case 'BACKSPACE': {
+        puzzle.state[tileIdx] = '-';
+      }
+    }
+
+    puzzle = puzzle;
+  }
+
+  function getNextTileIdx(currentTileIdx: number): number {
+    // TODO skip fillers, and respect current clue direction
+    return 0;
+  }
+
+  function isBlank(tileValue: string): boolean {
+    return tileValue === '-';
+  }
+
+  function isFiller(tileValue: string): boolean {
+    return tileValue === '.';
+  }
 </script>
 
 <main>
-  <div class="board" style="--boardSize: {examplePuz.width};">
-    {#each examplePuz.solution as tile}
-      <Tile value={tile} />
+  <div class="board" style="--boardSize: {puzzle.width};">
+    {#each puzzle.state as value, idx}
+      <Tile
+        value={value}
+        filler={isFiller(value)}
+        blank={isBlank(value)}
+        selected={selectedTileIdx === idx && !isFiller(value)}
+        on:click={() => handleTileClick(idx)}
+        on:keyup={(e) => handleTileKey(idx, e)}
+      />
     {/each}
   </div>
 </main>

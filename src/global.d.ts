@@ -2,7 +2,7 @@
 
 export interface ParsedPuz {
     solution: string;
-    state: string;
+    state: string[]; // string is outputted by @confuzzle/readpuz
     title: string;
     author: string;
     copyright: string;
