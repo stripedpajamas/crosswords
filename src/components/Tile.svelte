@@ -7,7 +7,7 @@
   export let ref: HTMLButtonElement = null;
 
   let displayValue: string;
-  $: displayValue = blank || filler ? ' ' : value;
+  $: displayValue = blank || filler ? " " : value;
 </script>
 
 <button
@@ -37,7 +37,8 @@
     background-color: black;
   }
 
-  .blank {}
+  .blank {
+  }
 
   .inSelectedWord.selected {
     background-color: rgba(135, 206, 250);

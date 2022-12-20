@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import type { ParsedPuz } from './global';
-  import Tile from './components/Tile.svelte';
+  import { onMount } from "svelte";
+  import type { ParsedPuz } from "./global";
+  import Tile from "./components/Tile.svelte";
 
   enum Direction {
     Across,
@@ -11,45 +11,49 @@
   // TODO probably fetch a parsedpuz object from backend based on current url
   // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
   let puzzle: ParsedPuz = {
-    solution: '.H.P.F...A.T.F.MONOPOLY.CARBON.N.L.R.E.T.A.U.CONE.TALLORDERS.R...R.L.R.E.T.ASPIRE.OBSERVER...N.S.W...O.E..GUESS.B.MOURN..R.B...E.E.T...REPRISAL.TREATY.E.I.A.L.H...O.ANTARCTICA.DOWN.E.T.R.E.N.O.A.FREEZE.DROLLERY.Y.D.D...L.E.D.',
-    state: '.-.-.-...-.-.-.--------.------.-.-.-.-.-.-.-.----.----------.-...-.-.-.-.-.------.--------...-.-.-...-.-..-----.-.-----..-.-...-.-.-...--------.------.-.-.-.-.-...-.----------.----.-.-.-.-.-.-.-.------.--------.-.-.-...-.-.-.'.split(''),
-    title: 'cru cryptic 229',
-    author: 'Dan Chall',
-    copyright: 'Dan ©hall',
+    solution:
+      ".H.P.F...A.T.F.MONOPOLY.CARBON.N.L.R.E.T.A.U.CONE.TALLORDERS.R...R.L.R.E.T.ASPIRE.OBSERVER...N.S.W...O.E..GUESS.B.MOURN..R.B...E.E.T...REPRISAL.TREATY.E.I.A.L.H...O.ANTARCTICA.DOWN.E.T.R.E.N.O.A.FREEZE.DROLLERY.Y.D.D...L.E.D.",
+    state:
+      ".-.-.-...-.-.-.--------.------.-.-.-.-.-.-.-.----.----------.-...-.-.-.-.-.------.--------...-.-.-...-.-..-----.-.-----..-.-...-.-.-...--------.------.-.-.-.-.-...-.----------.----.-.-.-.-.-.-.-.------.--------.-.-.-...-.-.-.".split(
+        ""
+      ),
+    title: "cru cryptic 229",
+    author: "Dan Chall",
+    copyright: "Dan ©hall",
     width: 15,
     height: 15,
     clues: [
-      'Switch on, or stop holding the right to drive? (6)',
-      'Fishing gear with magnetic end (4)',
+      "Switch on, or stop holding the right to drive? (6)",
+      "Fishing gear with magnetic end (4)",
       "A stronghold for Rapunzel's pride (8)",
-      'Editors ousting Red agents (6)',
-      'A rude otter swimming where the merchant vessels go (5,5)',
-      'A little Fresca? Our Peg? No, Seven and Seven (8)',
-      'Monday, old parrot talking a good game (8)',
+      "Editors ousting Red agents (6)",
+      "A rude otter swimming where the merchant vessels go (5,5)",
+      "A little Fresca? Our Peg? No, Seven and Seven (8)",
+      "Monday, old parrot talking a good game (8)",
       `Lily-livered shout "it hurts!" by telephone's inventor that is a little dazed (6-7)`,
-      'Oscar Bonavena embraces the basis of life on Earth (6)',
-      'Tip of cue touches yellow ball (solid) (4)',
+      "Oscar Bonavena embraces the basis of life on Earth (6)",
+      "Tip of cue touches yellow ball (solid) (4)",
       "Story about God and radical socialist's difficult challenges (4,6)",
       "Aim for something high, a steeple's top (6)",
-      'Stinko? Be daintier. Tipsy. (10)',
-      'One seeing an obstetrical nurse? (8)',
-      'Fancy segues in segues, segues (5)',
-      'Magritte comes back, dressed in dreary vegetation (8)',
+      "Stinko? Be daintier. Tipsy. (10)",
+      "One seeing an obstetrical nurse? (8)",
+      "Fancy segues in segues, segues (5)",
+      "Magritte comes back, dressed in dreary vegetation (8)",
       "Grieve over Mom's half-full container of ashes (5)",
-      'On the lam, sick from wood alcohol (8)',
-      'Err, a slip, bombed in retaliation (8)',
-      'Badly scared by Divine (6)',
-      'A compact as a special gift? (6)',
-      'Looking back, a period surrounding war is propitious (6)',
-      'Art: I can act crazy in the deep deep South? (10)',
-      'Feathers fell (4)',
-      'Do the French pay in charity? (4)',
-      'Fix a price of zero--half of zero (6)',
-      'Sitcom actress in dry humor (8)'
+      "On the lam, sick from wood alcohol (8)",
+      "Err, a slip, bombed in retaliation (8)",
+      "Badly scared by Divine (6)",
+      "A compact as a special gift? (6)",
+      "Looking back, a period surrounding war is propitious (6)",
+      "Art: I can act crazy in the deep deep South? (10)",
+      "Feathers fell (4)",
+      "Do the French pay in charity? (4)",
+      "Fix a price of zero--half of zero (6)",
+      "Sitcom actress in dry humor (8)",
     ],
-  }
+  };
 
-  let clueDirection = Direction.Across
+  let clueDirection = Direction.Across;
   let selectedTileIdx = getFirstAcrossClueIdx();
   let selectedWordTileIdxs = getWordBoundaryIdxs(selectedTileIdx);
   let tileElements = [];
@@ -57,10 +61,10 @@
   onMount(() => {
     // so typing works without clicking anything on first load
     tileElements[selectedTileIdx].focus();
-  })
+  });
 
   function isAlpha(value: string): boolean {
-    return value >= 'A' && value <= 'Z';
+    return value >= "A" && value <= "Z";
   }
 
   function selectTile(tileIdx: number): void {
@@ -84,18 +88,18 @@
 
   function getWordBoundaryIdxs(idx: number): Set<number> {
     const idxs = new Set<number>();
-    const forward = (i: number): number => clueDirection === Direction.Across
-      ? i + 1
-      : i + puzzle.width; // Direction.Down
-    const back = (i: number): number => clueDirection === Direction.Across
-      ? i - 1
-      : i - puzzle.width; // Direction.Down
-    const onStartingEdge = (i: number): boolean => clueDirection === Direction.Across
-      ? i % puzzle.width === 0 // leftmost column
-      : i < puzzle.width; // top row
-    const onEndingEdge = (i: number): boolean => clueDirection === Direction.Across
-      ? i % puzzle.width === puzzle.width - 1 // rightmost column
-      : i >= (puzzle.state.length - puzzle.width); // bottom row
+    const forward = (i: number): number =>
+      clueDirection === Direction.Across ? i + 1 : i + puzzle.width; // Direction.Down
+    const back = (i: number): number =>
+      clueDirection === Direction.Across ? i - 1 : i - puzzle.width; // Direction.Down
+    const onStartingEdge = (i: number): boolean =>
+      clueDirection === Direction.Across
+        ? i % puzzle.width === 0 // leftmost column
+        : i < puzzle.width; // top row
+    const onEndingEdge = (i: number): boolean =>
+      clueDirection === Direction.Across
+        ? i % puzzle.width === puzzle.width - 1 // rightmost column
+        : i >= puzzle.state.length - puzzle.width; // bottom row
 
     idxs.add(idx);
 
@@ -146,16 +150,16 @@
     }
 
     switch (key) {
-      case 'BACKSPACE': {
+      case "BACKSPACE": {
         if (isBlank(puzzle.state[tileIdx])) {
-          setTileValue(getPreviousTileIdx(tileIdx), '-');
+          setTileValue(getPreviousTileIdx(tileIdx), "-");
         } else {
-          setTileValue(tileIdx, '-');
+          setTileValue(tileIdx, "-");
         }
         selectTile(getPreviousTileIdx(tileIdx));
         break;
       }
-      case ' ': {
+      case " ": {
         toggleClueDirection();
         break;
       }
@@ -222,11 +226,11 @@
   }
 
   function isBlank(tileValue: string): boolean {
-    return tileValue === '-';
+    return tileValue === "-";
   }
 
   function isFiller(tileValue: string): boolean {
-    return tileValue === '.';
+    return tileValue === ".";
   }
 </script>
 
@@ -234,7 +238,7 @@
   <div class="board" style="--boardSize: {puzzle.width};">
     {#each puzzle.state as value, idx}
       <Tile
-        value={value}
+        {value}
         filler={isFiller(value)}
         blank={isBlank(value)}
         selected={selectedTileIdx === idx && !isFiller(value)}
