@@ -1,14 +1,24 @@
 <script lang="ts">
   export let selected: boolean;
+  export let inSelectedWord: boolean;
   export let filler: boolean;
   export let blank: boolean;
   export let value: string;
+  export let ref: HTMLButtonElement = null;
 
   let displayValue: string;
   $: displayValue = blank || filler ? ' ' : value;
 </script>
 
-<button class:filler class:blank class:selected on:click on:keyup>
+<button
+  class:filler
+  class:blank
+  class:selected
+  class:inSelectedWord
+  on:click
+  on:keyup
+  bind:this={ref}
+>
   <p>{displayValue}</p>
 </button>
 
@@ -31,5 +41,10 @@
 
   .selected {
     background-color: lightskyblue;
+  }
+
+  .inSelectedWord {
+    background-color: rgba(135, 206, 250, 0.5);
+
   }
 </style>

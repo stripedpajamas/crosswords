@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import type { ParsedPuz } from './global';
   import Tile from './components/Tile.svelte';
 
@@ -48,47 +49,169 @@
     ],
   }
 
-  let selectedTileIdx = 0;
   let clueDirection = Direction.Across
+  let selectedTileIdx = getFirstAcrossClueIdx();
+  let selectedWordTileIdxs = getWordBoundaryIdxs(selectedTileIdx);
+  let tileElements = [];
+
+  onMount(() => {
+    // so typing works without clicking anything on first load
+    tileElements[selectedTileIdx].focus();
+  })
 
   function isAlpha(value: string): boolean {
     return value >= 'A' && value <= 'Z';
   }
 
-  function handleTileUpdate(tileIdx: number, value: string): void {
-    if (!isAlpha(value)) {
+  function selectTile(tileIdx: number): void {
+    if (tileIdx >= puzzle.state.length) {
+      return selectTile(getFirstAcrossClueIdx());
+    }
+    if (!idxInBounds(tileIdx) || isFiller(puzzle[tileIdx])) {
       return;
     }
+    selectedTileIdx = tileIdx;
+    selectedWordTileIdxs = getWordBoundaryIdxs(selectedTileIdx);
+    tileElements[tileIdx].focus();
+  }
 
-    puzzle.state[tileIdx] = value;
-    puzzle = puzzle;
+  function getWordBoundaryIdxs(idx: number): Set<number> {
+    const idxs = new Set<number>();
+    const forward = (i: number): number => clueDirection === Direction.Across
+      ? i + 1
+      : i + puzzle.width; // Direction.Down
+    const back = (i: number): number => clueDirection === Direction.Across
+      ? i - 1
+      : i - puzzle.width; // Direction.Down
+    const onStartingEdge = (i: number): boolean => clueDirection === Direction.Across
+      ? i % puzzle.width === 0 // leftmost column
+      : i < puzzle.width; // top row
+    const onEndingEdge = (i: number): boolean => clueDirection === Direction.Across
+      ? i % puzzle.width === puzzle.width - 1 // rightmost column
+      : i >= (puzzle.state.length - puzzle.width); // bottom row
+
+    idxs.add(idx);
+
+    let start = idx;
+    while (!isFiller(puzzle.state[start])) {
+      idxs.add(start);
+      if (onStartingEdge(start)) {
+        break;
+      }
+      start = back(start);
+    }
+
+    let end = start === idx ? forward(idx) : idx;
+    while (!isFiller(puzzle.state[end])) {
+      idxs.add(end);
+      if (onEndingEdge(end)) {
+        break;
+      }
+      end = forward(end);
+    }
+
+    return idxs;
+  }
+
+  function idxInBounds(tileIdx: number): boolean {
+    return tileIdx >= 0 && tileIdx <= puzzle.state.length;
+  }
+
+  function setTileValue(idx: number, value: string): void {
+    if (idxInBounds(idx)) {
+      puzzle.state[idx] = value;
+      puzzle = puzzle;
+    }
   }
 
   function handleTileClick(tileIdx: number): void {
     if (isFiller(puzzle.state[tileIdx])) {
       return;
     }
-    selectedTileIdx = tileIdx;
+    return selectTile(tileIdx);
   }
 
   function handleTileKey(tileIdx: number, event: KeyboardEvent): void {
     const key = event.key.toUpperCase();
     if (key.length === 1 && isAlpha(key)) {
-      puzzle.state[tileIdx] = key;
+      setTileValue(tileIdx, key);
+      selectTile(getNextTileIdx(tileIdx));
     }
 
     switch (key) {
       case 'BACKSPACE': {
-        puzzle.state[tileIdx] = '-';
+        if (isBlank(puzzle.state[tileIdx])) {
+          setTileValue(getPreviousTileIdx(tileIdx), '-');
+        } else {
+          setTileValue(tileIdx, '-');
+        }
+        selectTile(getPreviousTileIdx(tileIdx));
+        break;
+      }
+      case ' ': {
+        toggleClueDirection();
+        break;
       }
     }
+  }
 
-    puzzle = puzzle;
+  function toggleClueDirection(): void {
+    if (clueDirection === Direction.Across) {
+      clueDirection = Direction.Down;
+    } else {
+      clueDirection = Direction.Across;
+    }
+  }
+
+  function getFirstAcrossClueIdx(): number {
+    // find the first group of 2 consecutive chars in the solution string
+    for (let i = 1; i < puzzle.state.length; i++) {
+      if (!isFiller(puzzle.state[i]) && !isFiller(puzzle.state[i - 1])) {
+        return i - 1;
+      }
+    }
+  }
+
+  // TODO these previous/next fns don't really work. they should go to the
+  // next char in the current selected word in the current clue direction, or if
+  // at the boundary of a word, they should go to the start of the next clue in
+  // the current clue direction.
+  function getPreviousTileIdx(currentTileIdx: number): number {
+    switch (clueDirection) {
+      case Direction.Across: {
+        let prevIdx = currentTileIdx - 1;
+        while (isFiller(puzzle.state[prevIdx])) {
+          prevIdx--;
+        }
+        return prevIdx;
+      }
+      case Direction.Down: {
+        let prevIdx = currentTileIdx - puzzle.width;
+        while (isFiller(puzzle.state[prevIdx])) {
+          prevIdx--;
+        }
+        return prevIdx;
+      }
+    }
   }
 
   function getNextTileIdx(currentTileIdx: number): number {
-    // TODO skip fillers, and respect current clue direction
-    return 0;
+    switch (clueDirection) {
+      case Direction.Across: {
+        let nextIdx = currentTileIdx + 1;
+        while (isFiller(puzzle.state[nextIdx])) {
+          nextIdx++;
+        }
+        return nextIdx;
+      }
+      case Direction.Down: {
+        let nextIdx = currentTileIdx + puzzle.width;
+        while (isFiller(puzzle.state[nextIdx])) {
+          nextIdx++;
+        }
+        return nextIdx;
+      }
+    }
   }
 
   function isBlank(tileValue: string): boolean {
@@ -108,8 +231,10 @@
         filler={isFiller(value)}
         blank={isBlank(value)}
         selected={selectedTileIdx === idx && !isFiller(value)}
+        inSelectedWord={selectedWordTileIdxs.has(idx)}
         on:click={() => handleTileClick(idx)}
         on:keyup={(e) => handleTileKey(idx, e)}
+        bind:ref={tileElements[idx]}
       />
     {/each}
   </div>
