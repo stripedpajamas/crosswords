@@ -30,12 +30,42 @@ export class Puzzle {
     }
   }
 
-  isFiller(idx: number): boolean {
+  isFillerTile(idx: number): boolean {
     return this.state[idx] === Puzzle.FILLER;
   }
 
-  isBlank(idx: number): boolean {
+  isBlankTile(idx: number): boolean {
     return this.state[idx] === Puzzle.BLANK;
+  }
+
+  // A word is at least 2 tiles long
+  isInWord(idx: number, clueDirection: Direction): boolean {
+    if (this.isFillerTile(idx)) {
+      return false;
+    }
+    if (this.onEndingEdge(idx, clueDirection)) {
+      return !this.isFillerTile(this.decIdx(idx, clueDirection));
+    }
+    if (this.onStartingEdge(idx, clueDirection)) {
+      return !this.isFillerTile(this.incIdx(idx, clueDirection));
+    }
+    return (
+      !this.isFillerTile(this.decIdx(idx, clueDirection)) ||
+      !this.isFillerTile(this.incIdx(idx, clueDirection))
+    );
+  }
+
+  isStartOfWord(idx: number, clueDirection: Direction): boolean {
+    if (this.isFillerTile(idx) || this.onEndingEdge(idx, clueDirection)) {
+      return false;
+    }
+    if (this.onStartingEdge(idx, clueDirection)) {
+      return true;
+    }
+    return (
+      this.isFillerTile(this.decIdx(idx, clueDirection)) &&
+      !this.isFillerTile(this.incIdx(idx, clueDirection))
+    );
   }
 
   idxInBounds(tileIdx: number): boolean {
@@ -62,12 +92,22 @@ export class Puzzle {
       : i >= this.state.length - this.width; // bottom row
   }
 
+  // TODO this is used by 'get start of next clue' and it doesn't work right.
+  // we figure out potential start of next clue by starting at the top of the
+  // current clue (in Down-mode) and scanning this.state for the start of a new
+  // clue that also goes Down. but we short circuit if the end of the current
+  // clue is the "last tile". sometimes there's a down clue that starts at an idx
+  // higher than the idx of the clue that ends on the last tile (this happens in 229).
+  isLastTile(i: number, clueDirection: Direction): boolean {
+    return i === this.getEndOfLastClueIdx(clueDirection);
+  }
+
   getWordBoundaryIdxs(idx: number, clueDirection: Direction): Set<number> {
     const idxs = new Set<number>();
     idxs.add(idx);
 
     let start = idx;
-    while (!this.isFiller(start)) {
+    while (!this.isFillerTile(start)) {
       idxs.add(start);
       if (this.onStartingEdge(start, clueDirection)) {
         break;
@@ -76,7 +116,7 @@ export class Puzzle {
     }
 
     let end = start === idx ? this.incIdx(idx, clueDirection) : idx;
-    while (!this.isFiller(end)) {
+    while (!this.isFillerTile(end)) {
       idxs.add(end);
       if (this.onEndingEdge(end, clueDirection)) {
         break;
@@ -87,11 +127,18 @@ export class Puzzle {
     return idxs;
   }
 
-  getFirstAcrossClueIdx(): number {
-    // find the first group of 2 consecutive chars
-    for (let i = 1; i < this.state.length; i++) {
-      if (!this.isFiller(i) && !this.isFiller(i - 1)) {
-        return i - 1;
+  getStartOfFirstClueIdx(clueDirection: Direction): number {
+    for (let i = 0; i < this.state.length; i++) {
+      if (this.isInWord(i, clueDirection)) {
+        return i;
+      }
+    }
+  }
+
+  getEndOfLastClueIdx(clueDirection: Direction): number {
+    for (let i = this.state.length - 1; i >= 0; i--) {
+      if (this.isInWord(i, clueDirection)) {
+        return i;
       }
     }
   }
@@ -104,14 +151,14 @@ export class Puzzle {
     switch (clueDirection) {
       case Direction.Across: {
         let prevIdx = currentTileIdx - 1;
-        while (this.isFiller(prevIdx)) {
+        while (this.isFillerTile(prevIdx)) {
           prevIdx--;
         }
         return prevIdx;
       }
       case Direction.Down: {
         let prevIdx = currentTileIdx - this.width;
-        while (this.isFiller(prevIdx)) {
+        while (this.isFillerTile(prevIdx)) {
           prevIdx--;
         }
         return prevIdx;
@@ -120,36 +167,40 @@ export class Puzzle {
   }
 
   getNextTileIdx(currentTileIdx: number, clueDirection: Direction): number {
-    switch (clueDirection) {
-      case Direction.Across: {
-        let nextIdx = currentTileIdx + 1;
-        while (this.isFiller(nextIdx)) {
-          nextIdx++;
-        }
-        return nextIdx;
-      }
-      case Direction.Down: {
-        let nextIdx = currentTileIdx + this.width;
-        while (this.isFiller(nextIdx)) {
-          nextIdx++;
-        }
-        return nextIdx;
-      }
+    let nextIdx = this.incIdx(currentTileIdx, clueDirection);
+    if (
+      this.isFillerTile(nextIdx) ||
+      this.onEndingEdge(currentTileIdx, clueDirection)
+    ) {
+      return this.getStartOfNextClueIdx(currentTileIdx, clueDirection);
     }
+
+    return nextIdx;
   }
 
-  // function getStartOfNextClueIdx(currentIdx: number): number {
-  //   // goto end of current word, then keep going until you reach
-  //   // a tile with at least one neighbor
-  //   switch (clueDirection) {
-  //     case Direction.Across: {
-  //       break;
-  //     }
-  //     case Direction.Down: {
-  //       break;
-  //     }
-  //   }
-  // }
+  getStartOfNextClueIdx(currentIdx: number, clueDirection: Direction): number {
+    const currentWordIdxs = this.getWordBoundaryIdxs(currentIdx, clueDirection);
+    const startOfCurrentWord = Math.min(...currentWordIdxs.values());
+    const endOfCurrentWord = Math.max(...currentWordIdxs.values());
+
+    if (this.isLastTile(endOfCurrentWord, clueDirection)) {
+      return this.getStartOfFirstClueIdx(clueDirection);
+    }
+
+    // not using incIdx for this because it increments within a word
+    // and here we are scanning linearally through the state array for
+    // a word (2+ chars) that continues in the current clue direction
+    let startOfNextClueIdx =
+      clueDirection === Direction.Across
+        ? endOfCurrentWord + 1
+        : startOfCurrentWord + 1;
+
+    while (!this.isStartOfWord(startOfNextClueIdx, clueDirection)) {
+      startOfNextClueIdx++;
+    }
+
+    return startOfNextClueIdx;
+  }
 
   static isAlpha(value: string): boolean {
     return value >= "A" && value <= "Z";

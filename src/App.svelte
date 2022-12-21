@@ -2,15 +2,18 @@
   import { Direction } from "./types";
   import { onMount } from "svelte";
   import { Puzzle } from "./data/puzzle";
-  import examplePuz from './testdata/example';
+  import examplePuz from "./testdata/example";
   import Tile from "./components/Tile.svelte";
 
   // TODO probably fetch a parsedpuz object from backend based on current url
   // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
   let puzzle = new Puzzle(examplePuz);
   let clueDirection = Direction.Across;
-  let selectedTileIdx = puzzle.getFirstAcrossClueIdx();
-  let selectedWordTileIdxs = puzzle.getWordBoundaryIdxs(selectedTileIdx, clueDirection);
+  let selectedTileIdx = puzzle.getStartOfFirstClueIdx(clueDirection);
+  let selectedWordTileIdxs = puzzle.getWordBoundaryIdxs(
+    selectedTileIdx,
+    clueDirection
+  );
   let tileElements = [];
 
   onMount(() => {
@@ -19,7 +22,7 @@
   });
 
   function selectTile(tileIdx: number): void {
-    if (!puzzle.idxInBounds(tileIdx) || puzzle.isFiller(tileIdx)) {
+    if (!puzzle.idxInBounds(tileIdx) || puzzle.isFillerTile(tileIdx)) {
       return;
     }
     if (tileIdx === selectedTileIdx) {
@@ -40,7 +43,7 @@
   }
 
   function handleTileClick(tileIdx: number): void {
-    if (puzzle.isFiller(tileIdx)) {
+    if (puzzle.isFillerTile(tileIdx)) {
       return;
     }
     return selectTile(tileIdx);
@@ -55,8 +58,11 @@
 
     switch (key) {
       case "BACKSPACE": {
-        if (puzzle.isBlank(tileIdx)) {
-          setTileValue(puzzle.getPreviousTileIdx(tileIdx, clueDirection), Puzzle.BLANK);
+        if (puzzle.isBlankTile(tileIdx)) {
+          setTileValue(
+            puzzle.getPreviousTileIdx(tileIdx, clueDirection),
+            Puzzle.BLANK
+          );
         } else {
           setTileValue(tileIdx, Puzzle.BLANK);
         }
@@ -84,9 +90,9 @@
     {#each puzzle.state as value, idx}
       <Tile
         {value}
-        filler={puzzle.isFiller(idx)}
-        blank={puzzle.isBlank(idx)}
-        selected={selectedTileIdx === idx && !puzzle.isFiller(idx)}
+        filler={puzzle.isFillerTile(idx)}
+        blank={puzzle.isBlankTile(idx)}
+        selected={selectedTileIdx === idx && !puzzle.isFillerTile(idx)}
         inSelectedWord={selectedWordTileIdxs.has(idx)}
         on:click={() => handleTileClick(idx)}
         on:keyup={(e) => handleTileKey(idx, e)}
