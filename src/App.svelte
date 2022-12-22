@@ -12,6 +12,9 @@
   let selectedTile = puzzle.getStartOfFirstClue(clueDirection);
   let tileElements = [];
 
+  let currentClue: { clue: string; idx: number } | undefined;
+  $: currentClue = puzzle.getClueForTile(selectedTile, clueDirection);
+
   onMount(() => {
     // so typing works without clicking anything on first load
     tileElements[selectedTile.idx].focus();
@@ -30,7 +33,6 @@
     }
     selectedTile = tile;
     tileElements[tile.idx].focus();
-    console.log(puzzle.clues[clueDirection][selectedTile.clueIdx[clueDirection]]);
   }
 
   function setTileValue(tile: PuzzleTile, value: string): void {
@@ -102,8 +104,11 @@
   }
 </script>
 
-<main>
-  <div class="board" style="--boardSize: {puzzle.width};">
+<main style="--boardSize: {puzzle.width};">
+  <div class="clue-bar">
+    <h3>{currentClue.idx + 1}. {currentClue.clue}</h3>
+  </div>
+  <div class="board">
     {#each puzzle.grid as tile, idx}
       <Tile
         value={puzzle.state[idx]}
@@ -117,6 +122,36 @@
       />
     {/each}
   </div>
+  <div class="clue-list">
+    <div class="clue-list-across">
+      <h3>Across</h3>
+      <ul>
+        {#each puzzle.clues[Direction.Across] as clue, idx}
+          <li>
+            <span
+              class="clue-text"
+              class:selected-clue={clueDirection === Direction.Across &&
+                idx === currentClue.idx}>{idx + 1}. {clue}</span
+            >
+          </li>
+        {/each}
+      </ul>
+    </div>
+    <div class="clue-list-down">
+      <h3>Down</h3>
+      <ul>
+        {#each puzzle.clues[Direction.Down] as clue, idx}
+          <li>
+            <span
+              class="clue-text"
+              class:selected-clue={clueDirection === Direction.Down &&
+                idx === currentClue.idx}>{idx + 1}. {clue}</span
+            >
+          </li>
+        {/each}
+      </ul>
+    </div>
+  </div>
 </main>
 
 <style>
@@ -125,11 +160,67 @@
     padding: 0;
   }
 
-  .board {
-    border: solid 1px black;
+  main {
     display: grid;
+    width: 100%;
+    grid-template-columns: calc(var(--boardSize) * 50px) 300px;
+    grid-template-rows: 50px calc(var(--boardSize) * 50px);
+  }
+
+  .board {
+    display: grid;
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
     width: calc(var(--boardSize) * 50px);
     grid-template-columns: repeat(var(--boardSize), 50px);
     grid-template-rows: repeat(var(--boardSize), 50px);
+  }
+
+  .clue-bar {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    text-align: center;
+  }
+
+  .clue-list {
+    grid-column: 2 / 3;
+    grid-row: 2 / 4;
+    margin-left: 10px;
+    display: grid;
+    grid-template-rows: repeat(2, calc(var(--boardSize) * 50px / 2));
+  }
+
+  .clue-list > div > h3 {
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    padding: 8px 0 8px 0;
+  }
+
+  .clue-list > div > ul > li {
+    list-style: none;
+  }
+
+  .clue-list > div {
+    overflow: hidden;
+  }
+
+  .clue-list > div > ul {
+    height: 100%;
+    overflow-y: scroll;
+    list-style-position: inside;
+  }
+
+  .clue-list-across {
+  }
+
+  .clue-list-down {
+  }
+
+  .selected-clue {
+    background-color: rgba(135, 206, 250, 0.4);
+    padding: 0.1em 0.2em;
   }
 </style>

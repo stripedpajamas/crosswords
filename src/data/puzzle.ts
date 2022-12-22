@@ -107,6 +107,17 @@ export class Puzzle {
     return this.state[idx] === Puzzle.BLANK;
   }
 
+  getClueForTile(
+    tile: PuzzleTile,
+    clueDirection: Direction
+  ): { clue: string; idx: number } | null {
+    if (tile.isFiller) return null;
+    return {
+      clue: this.clues[clueDirection][tile.clueIdx[clueDirection]],
+      idx: tile.clueIdx[clueDirection],
+    };
+  }
+
   getPlayTileRight(tile: PuzzleTile): PuzzleTile | undefined {
     let nextTile = this.grid[tile.idx + 1];
     if (this.onStartingEdge(nextTile.idx, Direction.Across)) {
@@ -150,7 +161,8 @@ export class Puzzle {
   }
 
   getPlayTileUp(tile: PuzzleTile): PuzzleTile | undefined {
-    let nextTile = this.grid[(tile.idx - this.width + this.grid.length) % this.grid.length];
+    let nextTile =
+      this.grid[(tile.idx - this.width + this.grid.length) % this.grid.length];
     if (this.onEndingEdge(nextTile.idx, Direction.Down)) {
       return;
     }
@@ -158,7 +170,10 @@ export class Puzzle {
       if (this.onStartingEdge(nextTile.idx, Direction.Down)) {
         return;
       }
-      nextTile = this.grid[(nextTile.idx - this.width + this.grid.length) % this.grid.length];
+      nextTile =
+        this.grid[
+          (nextTile.idx - this.width + this.grid.length) % this.grid.length
+        ];
     }
     return nextTile;
   }
