@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Direction } from "./types";
+  import { Direction, PuzzleTile } from "./types";
   import { onMount } from "svelte";
   import { Puzzle } from "./data/puzzle";
   import examplePuz from "./testdata/example";
@@ -9,68 +9,56 @@
   // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
   let puzzle = new Puzzle(examplePuz);
   let clueDirection = Direction.Across;
-  let selectedTileIdx = puzzle.getStartOfFirstClueIdx(clueDirection);
-  let selectedWordTileIdxs = puzzle.getWordBoundaryIdxs(
-    selectedTileIdx,
-    clueDirection
-  );
+  let selectedTile = puzzle.getStartOfFirstClue(clueDirection);
   let tileElements = [];
 
   onMount(() => {
     // so typing works without clicking anything on first load
-    tileElements[selectedTileIdx].focus();
+    tileElements[selectedTile.idx].focus();
   });
 
-  function selectTile(tileIdx: number): void {
-    if (!puzzle.idxInBounds(tileIdx) || puzzle.isFillerTile(tileIdx)) {
+  function selectTile(tile: PuzzleTile): void {
+    if (tile.isFiller) {
+      tileElements[selectedTile.idx].focus();
       return;
     }
-    if (tileIdx === selectedTileIdx) {
+    if (tile.idx === selectedTile.idx) {
       toggleClueDirection();
     }
-    selectedWordTileIdxs = puzzle.getWordBoundaryIdxs(tileIdx, clueDirection);
-    if (selectedWordTileIdxs.size <= 1) {
+    if (tile.wordIdxs[clueDirection].length <= 1) {
       toggleClueDirection();
-      selectedWordTileIdxs = puzzle.getWordBoundaryIdxs(tileIdx, clueDirection);
     }
-    selectedTileIdx = tileIdx;
-    tileElements[tileIdx].focus();
+    selectedTile = tile;
+    tileElements[tile.idx].focus();
   }
 
-  function setTileValue(idx: number, value: string): void {
-    puzzle.setStateValue(idx, value);
+  function setTileValue(tile: PuzzleTile, value: string): void {
+    puzzle.setStateValue(tile.idx, value);
     puzzle = puzzle;
   }
 
-  function handleTileClick(tileIdx: number): void {
-    if (puzzle.isFillerTile(tileIdx)) {
-      return;
-    }
-    return selectTile(tileIdx);
+  function handleTileClick(tile: PuzzleTile): void {
+    return selectTile(tile);
   }
 
-  function handleTileKey(tileIdx: number, event: KeyboardEvent): void {
+  function handleTileKey(tile: PuzzleTile, event: KeyboardEvent): void {
     const key = event.key.toUpperCase();
     if (key.length === 1 && Puzzle.isAlpha(key)) {
-      setTileValue(tileIdx, key);
-      selectTile(puzzle.getNextTileIdx(tileIdx, clueDirection));
+      setTileValue(tile, key);
+      selectTile(puzzle.getNextTile(tile, clueDirection));
     }
 
     switch (key) {
       case "BACKSPACE": {
-        if (puzzle.isBlankTile(tileIdx)) {
-          setTileValue(
-            puzzle.getPreviousTileIdx(tileIdx, clueDirection),
-            Puzzle.BLANK
-          );
+        const prevTile = puzzle.getPreviousTile(tile, clueDirection);
+        if (puzzle.isBlankTile(tile.idx) && prevTile) {
+          setTileValue(prevTile, Puzzle.BLANK);
         } else {
-          setTileValue(tileIdx, Puzzle.BLANK);
+          setTileValue(tile, Puzzle.BLANK);
         }
-        selectTile(puzzle.getPreviousTileIdx(tileIdx, clueDirection));
-        break;
-      }
-      case " ": {
-        toggleClueDirection();
+        if (prevTile) {
+          selectTile(prevTile);
+        }
         break;
       }
     }
@@ -87,15 +75,15 @@
 
 <main>
   <div class="board" style="--boardSize: {puzzle.width};">
-    {#each puzzle.state as value, idx}
+    {#each puzzle.grid as tile, idx}
       <Tile
-        {value}
-        filler={puzzle.isFillerTile(idx)}
+        value={puzzle.state[idx]}
+        filler={tile.isFiller}
         blank={puzzle.isBlankTile(idx)}
-        selected={selectedTileIdx === idx && !puzzle.isFillerTile(idx)}
-        inSelectedWord={selectedWordTileIdxs.has(idx)}
-        on:click={() => handleTileClick(idx)}
-        on:keyup={(e) => handleTileKey(idx, e)}
+        selected={tile.idx === selectedTile.idx}
+        inSelectedWord={selectedTile.wordIdxs[clueDirection].includes(idx)}
+        on:click={() => handleTileClick(tile)}
+        on:keyup={(e) => handleTileKey(tile, e)}
         bind:ref={tileElements[idx]}
       />
     {/each}
