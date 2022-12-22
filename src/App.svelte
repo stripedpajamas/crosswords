@@ -50,6 +50,34 @@
     }
 
     switch (key) {
+      case "ARROWRIGHT": {
+        const nextTile = puzzle.getPlayTileRight(tile);
+        if (nextTile) {
+          selectTile(nextTile);
+        }
+        break;
+      }
+      case "ARROWLEFT": {
+        const nextTile = puzzle.getPlayTileLeft(tile);
+        if (nextTile) {
+          selectTile(nextTile);
+        }
+        break;
+      }
+      case "ARROWDOWN": {
+        const nextTile = puzzle.getPlayTileDown(tile);
+        if (nextTile) {
+          selectTile(nextTile);
+        }
+        break;
+      }
+      case "ARROWUP": {
+        const nextTile = puzzle.getPlayTileUp(tile);
+        if (nextTile) {
+          selectTile(nextTile);
+        }
+        break;
+      }
       case "BACKSPACE": {
         const prevTile = puzzle.getPreviousTile(tile, clueDirection);
         if (puzzle.isBlankTile(tile.idx) && prevTile) {

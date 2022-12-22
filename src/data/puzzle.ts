@@ -107,6 +107,62 @@ export class Puzzle {
     return this.state[idx] === Puzzle.BLANK;
   }
 
+  getPlayTileRight(tile: PuzzleTile): PuzzleTile | undefined {
+    let nextTile = this.grid[tile.idx + 1];
+    if (this.onStartingEdge(nextTile.idx, Direction.Across)) {
+      return;
+    }
+    while (nextTile.isFiller) {
+      if (this.onEndingEdge(nextTile.idx, Direction.Across)) {
+        return;
+      }
+      nextTile = this.grid[nextTile.idx + 1];
+    }
+    return nextTile;
+  }
+
+  getPlayTileLeft(tile: PuzzleTile): PuzzleTile | undefined {
+    let nextTile = this.grid[tile.idx - 1];
+    if (this.onEndingEdge(nextTile.idx, Direction.Across)) {
+      return;
+    }
+    while (nextTile.isFiller) {
+      if (this.onStartingEdge(nextTile.idx, Direction.Across)) {
+        return;
+      }
+      nextTile = this.grid[nextTile.idx - 1];
+    }
+    return nextTile;
+  }
+
+  getPlayTileDown(tile: PuzzleTile): PuzzleTile | undefined {
+    let nextTile = this.grid[(tile.idx + this.width) % this.grid.length];
+    if (this.onStartingEdge(nextTile.idx, Direction.Down)) {
+      return;
+    }
+    while (nextTile.isFiller) {
+      if (this.onEndingEdge(nextTile.idx, Direction.Down)) {
+        return;
+      }
+      nextTile = this.grid[(nextTile.idx + this.width) % this.grid.length];
+    }
+    return nextTile;
+  }
+
+  getPlayTileUp(tile: PuzzleTile): PuzzleTile | undefined {
+    let nextTile = this.grid[(tile.idx - this.width + this.grid.length) % this.grid.length];
+    if (this.onEndingEdge(nextTile.idx, Direction.Down)) {
+      return;
+    }
+    while (nextTile.isFiller) {
+      if (this.onStartingEdge(nextTile.idx, Direction.Down)) {
+        return;
+      }
+      nextTile = this.grid[(nextTile.idx - this.width + this.grid.length) % this.grid.length];
+    }
+    return nextTile;
+  }
+
   getStartOfFirstClue(clueDirection: Direction): PuzzleTile {
     return this.grid.find(
       (tile) =>
