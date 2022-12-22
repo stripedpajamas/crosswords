@@ -30,6 +30,7 @@
     }
     selectedTile = tile;
     tileElements[tile.idx].focus();
+    console.log(puzzle.clues[clueDirection][selectedTile.clueIdx[clueDirection]]);
   }
 
   function setTileValue(tile: PuzzleTile, value: string): void {

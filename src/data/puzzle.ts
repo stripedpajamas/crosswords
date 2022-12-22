@@ -67,11 +67,11 @@ export class Puzzle {
       // first.
       if (isStartOfWordAcross) {
         tileClueIdx[Direction.Across] =
-          this.clues[Direction.Across].push(this.clues[clueIdx++]) - 1;
+          this.clues[Direction.Across].push(this.clueList[clueIdx++]) - 1;
       }
       if (isStartOfWordDown) {
         tileClueIdx[Direction.Down] =
-          this.clues[Direction.Down].push(this.clues[clueIdx++]) - 1;
+          this.clues[Direction.Down].push(this.clueList[clueIdx++]) - 1;
       }
 
       this.grid[i] = {
