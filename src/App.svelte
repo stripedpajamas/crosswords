@@ -4,6 +4,7 @@
   import { Puzzle } from "./data/puzzle";
   import examplePuz from "./testdata/example";
   import Tile from "./components/Tile.svelte";
+  import ClueList from "./components/ClueList.svelte";
 
   // TODO probably fetch a parsedpuz object from backend based on current url
   // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
@@ -102,6 +103,15 @@
       clueDirection = Direction.Across;
     }
   }
+
+  function selectClue(direction: Direction, clueIdx: number): void {
+    // If they click a clue that we're already "on", don't try to select it (which would
+    // toggle the clue direction).
+    if (selectedTile.clueIdx[direction] === clueIdx && clueDirection === direction) {
+      return;
+    }
+    selectTile(puzzle.getStartingTileForClue(direction, clueIdx));
+  }
 </script>
 
 <main style="--boardSize: {puzzle.width};">
@@ -122,39 +132,15 @@
       />
     {/each}
   </div>
-  <div class="clue-list">
-    <div class="clue-list-across">
-      <h3>Across</h3>
-      <ul>
-        {#each puzzle.clues[Direction.Across] as clue, idx}
-          <li>
-            <span
-              class="clue-text"
-              class:selected-clue={clueDirection === Direction.Across &&
-                idx === currentClue.idx}>{idx + 1}. {clue}</span
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-    <div class="clue-list-down">
-      <h3>Down</h3>
-      <ul>
-        {#each puzzle.clues[Direction.Down] as clue, idx}
-          <li>
-            <span
-              class="clue-text"
-              class:selected-clue={clueDirection === Direction.Down &&
-                idx === currentClue.idx}>{idx + 1}. {clue}</span
-            >
-          </li>
-        {/each}
-      </ul>
-    </div>
-  </div>
+  <ClueList
+    selectClue={selectClue}
+    clues={puzzle.clues}
+    currentClue={currentClue}
+    clueDirection={clueDirection}
+  />
 </main>
 
-<style>
+<style lang="scss">
   * {
     margin: 0;
     padding: 0;
@@ -183,44 +169,5 @@
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     text-align: center;
-  }
-
-  .clue-list {
-    grid-column: 2 / 3;
-    grid-row: 2 / 4;
-    margin-left: 10px;
-    display: grid;
-    grid-template-rows: repeat(2, calc(var(--boardSize) * 50px / 2));
-  }
-
-  .clue-list > div > h3 {
-    border-top: 2px solid black;
-    border-bottom: 2px solid black;
-    padding: 8px 0 8px 0;
-  }
-
-  .clue-list > div > ul > li {
-    list-style: none;
-  }
-
-  .clue-list > div {
-    overflow: hidden;
-  }
-
-  .clue-list > div > ul {
-    height: 100%;
-    overflow-y: scroll;
-    list-style-position: inside;
-  }
-
-  .clue-list-across {
-  }
-
-  .clue-list-down {
-  }
-
-  .selected-clue {
-    background-color: rgba(135, 206, 250, 0.4);
-    padding: 0.1em 0.2em;
   }
 </style>

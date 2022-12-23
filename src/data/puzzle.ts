@@ -107,6 +107,10 @@ export class Puzzle {
     return this.state[idx] === Puzzle.BLANK;
   }
 
+  getStartingTileForClue(clueDirection: Direction, clueIdx: number): PuzzleTile {
+    return this.grid.find((tile) => !tile.isFiller && tile.isStartOfWord && tile.clueIdx[clueDirection] === clueIdx);
+  }
+
   getClueForTile(
     tile: PuzzleTile,
     clueDirection: Direction
