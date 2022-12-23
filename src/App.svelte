@@ -5,6 +5,7 @@
   import examplePuz from "./testdata/example";
   import Tile from "./components/Tile.svelte";
   import ClueList from "./components/ClueList.svelte";
+  import ClueBar from "./components/ClueBar.svelte";
 
   // TODO probably fetch a parsedpuz object from backend based on current url
   // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
@@ -115,9 +116,7 @@
 </script>
 
 <main style="--boardSize: {puzzle.width};">
-  <div class="clue-bar">
-    <h3>{currentClue.idx + 1}. {currentClue.clue}</h3>
-  </div>
+  <ClueBar currentClue={currentClue} />
   <div class="board">
     {#each puzzle.grid as tile, idx}
       <Tile
@@ -141,7 +140,7 @@
 </main>
 
 <style lang="scss">
-  * {
+  :global(*) {
     margin: 0;
     padding: 0;
   }
@@ -160,14 +159,5 @@
     width: calc(var(--boardSize) * 50px);
     grid-template-columns: repeat(var(--boardSize), 50px);
     grid-template-rows: repeat(var(--boardSize), 50px);
-  }
-
-  .clue-bar {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-    text-align: center;
   }
 </style>

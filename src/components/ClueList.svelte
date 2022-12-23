@@ -64,7 +64,6 @@
       }
 
       ul {
-        padding: 0;
         height: 100%;
         overflow-y: scroll;
         list-style-position: inside;
