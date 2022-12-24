@@ -4,13 +4,14 @@ export class Puzzle {
   static FILLER = ".";
   static BLANK = "-";
 
+  private state: string[];
+
   readonly solution: string;
   readonly title: string;
   readonly author: string;
   readonly copyright: string;
   readonly width: number;
   readonly height: number;
-  readonly state: string[];
   readonly clueList: string[];
 
   readonly clues: { [key in Direction]: string[] };
@@ -99,12 +100,20 @@ export class Puzzle {
     this.state[idx] = value;
   }
 
+  getState(idx: number): string | undefined {
+    return this.state[idx];
+  }
+
   isFillerTile(idx: number): boolean {
     return this.state[idx] === Puzzle.FILLER;
   }
 
   isBlankTile(idx: number): boolean {
     return this.state[idx] === Puzzle.BLANK;
+  }
+
+  clearPuzzle() {
+    this.state = this.state.map(x => x !== Puzzle.FILLER ? Puzzle.BLANK : Puzzle.FILLER);
   }
 
   getStartingTileForClue(clueDirection: Direction, clueIdx: number): PuzzleTile {
