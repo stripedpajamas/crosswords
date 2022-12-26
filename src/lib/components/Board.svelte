@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Puzzle } from "../data/puzzle";
-  import type { Direction, PuzzleTile } from "../types";
+  import { Puzzle } from "$lib/data/puzzle";
+  import type { Direction, PuzzleTile } from "$lib/types";
   import Tile from "./Tile.svelte";
 
   export let puzzle: Puzzle;

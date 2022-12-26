@@ -1,4 +1,5 @@
-import { Direction, ParsedPuz, PuzzleTile } from "../types";
+import { Direction } from "$lib/types";
+import type { ParsedPuz, PuzzleTile } from "$lib/types";
 
 export class Puzzle {
   static FILLER = ".";

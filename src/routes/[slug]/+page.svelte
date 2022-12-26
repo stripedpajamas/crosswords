@@ -1,21 +1,20 @@
 <script lang="ts">
-  import { Direction, PuzzleTile } from "./types";
+  import { Direction, type PuzzleTile } from "$lib/types";
   import { onMount } from "svelte";
-  import { Puzzle } from "./data/puzzle";
-  import examplePuz from "./testdata/example";
-  import ClueList from "./components/ClueList.svelte";
-  import ClueBar from "./components/ClueBar.svelte";
-  import Board from "./components/Board.svelte";
-  import CommandBar from "./components/CommandBar.svelte";
+  import { Puzzle } from "$lib/data/puzzle";
+  import ClueList from "$lib/components/ClueList.svelte";
+  import ClueBar from "$lib/components/ClueBar.svelte";
+  import Board from "$lib/components/Board.svelte";
+  import CommandBar from "$lib/components/CommandBar.svelte";
 
-  // TODO probably fetch a parsedpuz object from backend based on current url
-  // so like /asdfasdf calls the backend for puzzle id:asdfasdf and uses renders the response
-  let puzzle = new Puzzle(examplePuz);
+  export let data;
+
+  let puzzle = new Puzzle(data.puz);
   let clueDirection = Direction.Across;
   let selectedTile = puzzle.getStartOfFirstClue(clueDirection);
-  let tileElements = [];
+  let tileElements: HTMLButtonElement[] = [];
 
-  let currentClue: { clue: string; idx: number } | undefined;
+  let currentClue: { clue: string; idx: number } | null;
   $: currentClue = puzzle.getClueForTile(selectedTile, clueDirection);
 
   onMount(() => {
@@ -31,7 +30,7 @@
     if (tile.idx === selectedTile.idx) {
       toggleClueDirection();
     }
-    if (tile.wordIdxs[clueDirection].length <= 1) {
+    if (tile.wordIdxs && tile.wordIdxs[clueDirection].length <= 1) {
       toggleClueDirection();
     }
     selectedTile = tile;
@@ -55,6 +54,7 @@
     // If they click a clue that we're already "on", don't try to select it (which would
     // toggle the clue direction).
     if (
+      selectedTile.clueIdx &&
       selectedTile.clueIdx[direction] === clueIdx &&
       clueDirection === direction
     ) {

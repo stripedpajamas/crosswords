@@ -4,7 +4,7 @@
   export let filler: boolean;
   export let blank: boolean;
   export let value: string;
-  export let ref: HTMLButtonElement = null;
+  export let ref: any = null;
 
   let displayValue: string;
   $: displayValue = blank || filler ? " " : value;
