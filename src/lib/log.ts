@@ -29,7 +29,7 @@ class DoubleLogger implements Logger {
 
   constructor() {
     this.outputs = [new ConsoleLogger()];
-    if (!PUBLIC_LOCAL_DEV) {
+    if (PUBLIC_LOCAL_DEV !== 'true') {
       this.outputs.push(new Logtail('1AUqbfSc2uLekZ7MuLM8qwsE'));
     }
   }
