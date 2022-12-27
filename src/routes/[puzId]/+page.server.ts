@@ -5,18 +5,17 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { R2_ENDPOINT, ACCESS_KEY, SECRET_KEY } from '$env/static/private';
 import type { PageServerLoadEvent } from './$types';
 
-log.debug('instantiating r2 client');
-const r2 = new S3Client({
-	region: 'auto',
-	endpoint: R2_ENDPOINT,
-	credentials: {
-		accessKeyId: ACCESS_KEY,
-		secretAccessKey: SECRET_KEY
-	}
-});
-
-
 export async function load({ params }: PageServerLoadEvent) {
+	log.debug('instantiating r2 client');
+	const r2 = new S3Client({
+		region: 'auto',
+		endpoint: R2_ENDPOINT,
+		credentials: {
+			accessKeyId: ACCESS_KEY,
+			secretAccessKey: SECRET_KEY
+		}
+	});
+
 	log.debug('load puz start', params);
 	if (!params.puzId) {
 		log.info("no puzId, can't load puz file", params);
