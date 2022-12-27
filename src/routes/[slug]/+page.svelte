@@ -6,8 +6,11 @@
   import ClueBar from "$lib/components/ClueBar.svelte";
   import Board from "$lib/components/Board.svelte";
   import CommandBar from "$lib/components/CommandBar.svelte";
+  import { log } from '$lib/log';
 
   export let data;
+
+  log.info('rendering puzzle', data);
 
   let puzzle = new Puzzle(data.puz);
   let clueDirection = Direction.Across;
