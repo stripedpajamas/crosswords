@@ -3,6 +3,7 @@ import { log } from '$lib/log';
 import { readpuz } from '@confuzzle/readpuz';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { R2_ENDPOINT, ACCESS_KEY, SECRET_KEY } from '$env/static/private';
+import type { PageServerLoadEvent } from './$types';
 
 log.debug('instantiating r2 client');
 const r2 = new S3Client({
@@ -15,11 +16,11 @@ const r2 = new S3Client({
 });
 
 
-export async function load({ params }) {
+export async function load({ params }: PageServerLoadEvent) {
 	log.debug('load puz start', params);
-	if (!params.slug) {
-		log.info("no slug, can't load puz file", params);
-		return error(404);
+	if (!params.puzId) {
+		log.info("no puzId, can't load puz file", params);
+		throw error(404);
 	}
 
 	let res;
@@ -27,12 +28,12 @@ export async function load({ params }) {
 		res = await r2.send(
 			new GetObjectCommand({
 				Bucket: 'crosswords',
-				Key: params.slug
+				Key: params.puzId
 			})
 		);
 	} catch (e: any) {
 		log.error('error getting object from r2', e);
-		return error(404);
+		throw error(404);
 	}
 
 	let puz;
@@ -41,7 +42,7 @@ export async function load({ params }) {
 		puz = readpuz(puzBytes);
 	} catch (e: any) {
 		log.error('error parsing puz bytes', e);
-		return error(404);
+		throw error(404);
 	}
 
 	// Some binary stuff we don't care about

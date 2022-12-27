@@ -4,7 +4,7 @@ import type { HandleClientError } from '@sveltejs/kit';
 export const handleError: HandleClientError = ({ error, event }) => {
 	try {
 		log.error('unexpected client error', {
-			error: error as any,
+			error: (error as any).message,
 			event: JSON.stringify(event)
 		});
 	} catch (e) {}
