@@ -14,6 +14,7 @@ const r2 = new S3Client({
 	}
 });
 
+
 export async function load({ params }) {
 	log.debug('load puz start', params);
 	if (!params.slug) {
