@@ -62,6 +62,9 @@
 		) {
 			return;
 		}
+		if (direction !== clueDirection) {
+			toggleClueDirection();
+		}
 		selectTile(puzzle.getStartingTileForClue(direction, clueIdx));
 	}
 
