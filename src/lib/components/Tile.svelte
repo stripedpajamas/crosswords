@@ -42,9 +42,6 @@
 		background-color: black;
 	}
 
-	.blank {
-	}
-
 	.inSelectedWord.selected {
 		background-color: rgba(135, 206, 250);
 	}

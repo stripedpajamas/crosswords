@@ -22,3 +22,13 @@ export type PuzzleTile = {
   isStartOfWord?: { [key in Direction]: boolean };
   isEndOfWord?: { [key in Direction]: boolean };
 };
+
+export type PuzzleMetadataShort = {
+  title: string;
+  author: string;
+  imported: number;
+}
+
+export type PuzzleMetadataWithKey = PuzzleMetadataShort & {
+  key: string;
+}

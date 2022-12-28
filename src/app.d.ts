@@ -10,7 +10,8 @@ declare namespace App {
 	// interface PageData {}
 	interface Platform {
 		env?: {
-			R2_BUCKET: R2Bucket
+			R2_BUCKET: R2Bucket,
+			KV: KVNamespace
 		}
 	}
 }

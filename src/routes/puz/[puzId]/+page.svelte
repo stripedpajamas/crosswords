@@ -7,8 +7,9 @@
 	import ClueBar from '$lib/components/ClueBar.svelte';
 	import Board from '$lib/components/Board.svelte';
 	import CommandBar from '$lib/components/CommandBar.svelte';
+	import type { PageServerData } from './$types';
 
-	export let data;
+	export let data: PageServerData;
 
 	let puzzle = new Puzzle(data.puz);
 	let clueDirection = Direction.Across;
@@ -90,10 +91,6 @@
 </main>
 
 <style lang="scss">
-	:global(*) {
-		margin: 0;
-		padding: 0;
-	}
 	main {
 		display: grid;
 		width: 100%;

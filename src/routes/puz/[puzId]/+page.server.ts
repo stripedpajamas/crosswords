@@ -1,9 +1,12 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoadEvent } from './$types';
-import example from '$lib/data/example'; // uncomment for local dev
+import example from '$lib/data/example';
 
 export async function load({ params, platform }: PageServerLoadEvent) {
-	return { puz: example }; // uncomment for local dev
+	if (!platform || !platform.env) {
+		return { puz: example };
+	}
+
 	let res, puz;
 	try {
 		res = await platform.env?.R2_BUCKET.get(params.puzId)

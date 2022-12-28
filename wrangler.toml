@@ -8,6 +8,9 @@ main = "./.cloudflare/worker.js"
 r2_buckets = [
   {binding = "R2_BUCKET", bucket_name = "crosswords", preview_bucket_name = "crosswords-dev"},
 ]
+kv_namespaces = [
+  { binding = "KV", id = "158f941b38474c21b21aa5e9f045cae8", preview_id = "9485114344e94e84ad2c6fed8d35c8b9" },
+]
 
 [site]
 bucket = "./.cloudflare/public"
