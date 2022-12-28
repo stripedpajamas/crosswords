@@ -57,8 +57,8 @@ export class Puzzle {
 			};
 
 			const tileClueIdx = {
-				[Direction.Across]: this.grid[Math.min(...wordIdxsAcross)]?.clueIdx.Across,
-				[Direction.Down]: this.grid[Math.min(...wordIdxsDown)]?.clueIdx.Down
+				[Direction.Across]: this.grid[Math.min(...wordIdxsAcross)]?.clueIdx?.Across,
+				[Direction.Down]: this.grid[Math.min(...wordIdxsDown)]?.clueIdx?.Down
 			};
 
 			// Not sure if this is always the case (hopefully it is), but when an A and D
@@ -127,15 +127,15 @@ export class Puzzle {
 
 	getStartingTileForClue(clueDirection: Direction, clueIdx: number): PuzzleTile {
 		return this.grid.find(
-			(tile) => !tile.isFiller && tile.isStartOfWord && tile.clueIdx[clueDirection] === clueIdx
-		);
+			(tile) => !tile.isFiller && tile.isStartOfWord && tile.clueIdx![clueDirection] === clueIdx
+		)!;
 	}
 
 	getClueForTile(tile: PuzzleTile, clueDirection: Direction): { clue: string; idx: number } | null {
 		if (tile.isFiller) return null;
 		return {
-			clue: this.clues[clueDirection][tile.clueIdx[clueDirection]],
-			idx: tile.clueIdx[clueDirection]
+			clue: this.clues[clueDirection][tile.clueIdx![clueDirection]!],
+			idx: tile.clueIdx![clueDirection]!
 		};
 	}
 
@@ -196,16 +196,16 @@ export class Puzzle {
 	}
 
 	getStartOfFirstClue(clueDirection: Direction): PuzzleTile {
-		return this.grid.find(
-			(tile) =>
-				!tile.isFiller && tile.isStartOfWord[clueDirection] && tile.clueIdx[clueDirection] === 0
-		);
+		return this.getStartingTileForClue(clueDirection, 0);
 	}
 
 	getPreviousTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {
+		if (currentTile.isFiller) {
+			throw new Error('unsupported to call getPreviousTile on a filler tile');
+		}
 		let prevIdx =
-			currentTile.wordIdxs[clueDirection][
-				currentTile.wordIdxs[clueDirection].findIndex((idx) => idx === currentTile.idx) - 1
+			currentTile.wordIdxs![clueDirection][
+				currentTile.wordIdxs![clueDirection].findIndex((idx) => idx === currentTile.idx) - 1
 			];
 		if (prevIdx === undefined) {
 			// at start of current word
@@ -216,9 +216,12 @@ export class Puzzle {
 	}
 
 	getNextTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {
+		if (currentTile.isFiller) {
+			throw new Error('unsupported to call getNextTile on a filler tile');
+		}
 		let nextIdx =
-			currentTile.wordIdxs[clueDirection][
-				currentTile.wordIdxs[clueDirection].findIndex((idx) => idx === currentTile.idx) + 1
+			currentTile.wordIdxs![clueDirection][
+				currentTile.wordIdxs![clueDirection].findIndex((idx) => idx === currentTile.idx) + 1
 			];
 		if (nextIdx === undefined) {
 			// at end of current word
@@ -229,27 +232,35 @@ export class Puzzle {
 	}
 
 	getStartOfNextClueTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {
-		const nextClueIdx = (currentTile.clueIdx[clueDirection] + 1) % this.clues[clueDirection].length;
+		if (currentTile.isFiller) {
+			throw new Error('unsupported to call getStartOfNextClueTile on a filler tile');
+		}
+		const nextClueIdx =
+			(currentTile.clueIdx![clueDirection]! + 1) % this.clues[clueDirection].length;
 
 		return this.grid.find((tile) => {
 			return (
 				!tile.isFiller &&
-				tile.isStartOfWord[clueDirection] &&
-				tile.clueIdx[clueDirection] === nextClueIdx
+				tile.isStartOfWord![clueDirection] &&
+				tile.clueIdx![clueDirection] === nextClueIdx
 			);
-		});
+		})!;
 	}
 
 	getEndOfPrevClueTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {
-		const prevClueIdx = (currentTile.clueIdx[clueDirection] - 1) % this.clues[clueDirection].length;
+		if (currentTile.isFiller) {
+			throw new Error('unsupported to call getEndOfPrevClueTile on a filler tile');
+		}
+		const prevClueIdx =
+			(currentTile.clueIdx![clueDirection]! - 1) % this.clues[clueDirection].length;
 
 		return this.grid.find((tile) => {
 			return (
 				!tile.isFiller &&
-				tile.isEndOfWord[clueDirection] &&
-				tile.clueIdx[clueDirection] === prevClueIdx
+				tile.isEndOfWord![clueDirection] &&
+				tile.clueIdx![clueDirection] === prevClueIdx
 			);
-		});
+		})!;
 	}
 
 	private isStartOfWord(idx: number, clueDirection: Direction): boolean {
