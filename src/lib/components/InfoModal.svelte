@@ -41,7 +41,7 @@
 		padding: 16px;
 		background: white;
 		display: grid;
-    row-gap: 1em;
+		row-gap: 1em;
 		pointer-events: auto;
 	}
 
