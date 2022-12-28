@@ -19,7 +19,7 @@ export async function load({ platform }: PageServerLoadEvent) {
 	const toc: PuzzleMetadataWithKey[] = (res as KVNamespaceListResult<PuzzleMetadataShort>).keys.map(
 		({ name, metadata }) => ({ key: name, ...metadata! })
 	);
-  toc.sort((a, b) => a.imported - b.imported)
+  toc.sort((a, b) => b.imported - a.imported)
 
 	return { toc };
 }

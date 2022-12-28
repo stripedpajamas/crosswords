@@ -42,9 +42,11 @@ export const actions = {
 			// storing the relevant data in kv-metadata (max size 1024b) so
 			// we don't have to do a get after we list keys on the home page
 			await event.platform.env?.KV.put(key, '', {
-				title: puz.title,
-				author: puz.author,
-				imported: Date.now(),
+				metadata: {
+					title: puz.title,
+					author: puz.author,
+					imported: Date.now()
+				}
 			});
 		} catch (e: any) {
 			console.error('failed to update KV with new puz key', e);
