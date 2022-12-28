@@ -1,0 +1,16 @@
+account_id = "77eea2c5e9ad57aec99f52a12b067426"
+compatibility_date = "2021-11-12"
+name = "crosswords"
+workers_dev = true
+
+main = "./.cloudflare/worker.js"
+
+r2_buckets = [
+  {binding = "R2_BUCKET", bucket_name = "crosswords", preview_bucket_name = "crosswords-dev"},
+]
+
+[site]
+bucket = "./.cloudflare/public"
+
+[build]
+command = "npm run build"

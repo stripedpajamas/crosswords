@@ -1,0 +1,11 @@
+diff --git a/node_modules/@confuzzle/readpuz/readpuz.js b/node_modules/@confuzzle/readpuz/readpuz.js
+index 247dab4..869db39 100644
+--- a/node_modules/@confuzzle/readpuz/readpuz.js
++++ b/node_modules/@confuzzle/readpuz/readpuz.js
+@@ -1,5 +1,6 @@
+ const puz_common = require('@confuzzle/puz-common');
+ const iconv = require('iconv-lite');
++const Buffer = require('buffer/').Buffer;
+ 
+ // http://code.google.com/p/puz/wiki/FileFormat
+ // https://github.com/tedtate/puzzler/blob/master/lib/crossword.js
