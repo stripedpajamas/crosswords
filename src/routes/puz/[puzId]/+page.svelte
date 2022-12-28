@@ -2,6 +2,7 @@
   import { Direction, type PuzzleTile } from "$lib/types";
   import { onMount } from "svelte";
   import { Puzzle } from "$lib/data/puzzle";
+  import { Modals, closeModal } from 'svelte-modals';
   import ClueList from "$lib/components/ClueList.svelte";
   import ClueBar from "$lib/components/ClueBar.svelte";
   import Board from "$lib/components/Board.svelte";
@@ -69,9 +70,17 @@
   }
 </script>
 
+<Modals>
+  <div
+    slot="backdrop"
+    class="backdrop"
+    on:click={closeModal}
+    on:keydown={e => e.key === 'Escape' && closeModal()}
+  />
+</Modals>
 <main style="--boardSize: {puzzle.width};">
   <ClueBar {currentClue} />
-  <CommandBar clearPuzzle={clearPuzzle} />
+  <CommandBar clearPuzzle={clearPuzzle} getInfo={() => puzzle.getInfo()}/>
   <Board
     {puzzle}
     {clueDirection}
@@ -93,5 +102,14 @@
     width: 100%;
     grid-template-columns: calc(var(--boardSize) * 50px) 300px;
     grid-template-rows: 50px calc(var(--boardSize) * 50px);
+  }
+
+  .backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
   }
 </style>

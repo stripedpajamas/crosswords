@@ -1,15 +1,26 @@
 <script lang="ts">
+  import { openModal } from 'svelte-modals';
   import FaExclamationTriangle from 'svelte-icons/fa/FaExclamationTriangle.svelte'
   import FaCheckDouble from 'svelte-icons/fa/FaCheckDouble.svelte'
   import FaInfo from 'svelte-icons/fa/FaInfo.svelte'
+  import Modal from '$lib/components/InfoModal.svelte';
 
   export let clearPuzzle: () => void;
+  export let getInfo: () => { title: string, author: string, copyright: string };
+
+  function handleInfoClick() {
+    const info = getInfo();
+    openModal(Modal, {
+      title: info.title,
+      message: `${info.author} (copyright: ${info.copyright})`,
+    });
+  }
 </script>
 
 <div class="command-bar">
   <button on:click={clearPuzzle} title="Clear puzzle" class="dangerous"><FaExclamationTriangle /></button>
   <button title="Check puzzle"><FaCheckDouble /></button>
-  <button title="Puzzle info"><FaInfo /></button>
+  <button title="Puzzle info" on:click={handleInfoClick}><FaInfo /></button>
 </div>
 
 <style lang="scss">

@@ -97,6 +97,14 @@ export class Puzzle {
     return value >= "A" && value <= "Z";
   }
 
+  getInfo(): { title: string, author: string, copyright: string } {
+    return {
+      title: this.title,
+      author: this.author,
+      copyright: this.copyright,
+    };
+  }
+
   setStateValue(idx: number, value: string): void {
     this.state[idx] = value;
   }

@@ -22,7 +22,7 @@
   <p>{displayValue}</p>
 </button>
 
-<style>
+<style lang="scss">
   button {
     border: 1px solid black;
     display: grid;
@@ -31,6 +31,11 @@
     text-align: center;
     width: 100%;
     font-size: 24px;
+    background-color: white;
+
+    &:hover:not(.filler) {
+      filter: brightness(90%);
+    }
   }
 
   .filler {
