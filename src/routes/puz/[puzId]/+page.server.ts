@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoadEvent } from './$types';
-import example from '$lib/data/example';
+import examples from '$lib/data/examples';
 
 export async function load({ params, platform }: PageServerLoadEvent) {
 	if (!platform || !platform.env) {
-		return { puz: example };
+		return { puz: examples[Math.floor(Math.random() * examples.length) % examples.length] };
 	}
 
 	let res, puz;

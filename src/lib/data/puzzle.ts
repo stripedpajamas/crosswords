@@ -267,7 +267,10 @@ export class Puzzle {
 		if (this.isFillerTile(idx) || this.onEndingEdge(idx, clueDirection)) {
 			return false;
 		}
-		if (this.onStartingEdge(idx, clueDirection)) {
+		if (
+			this.onStartingEdge(idx, clueDirection) &&
+			!this.isFillerTile(this.incIdx(idx, clueDirection))
+		) {
 			return true;
 		}
 		return (
@@ -280,7 +283,10 @@ export class Puzzle {
 		if (this.isFillerTile(idx) || this.onStartingEdge(idx, clueDirection)) {
 			return false;
 		}
-		if (this.onEndingEdge(idx, clueDirection)) {
+		if (
+			this.onEndingEdge(idx, clueDirection) &&
+			!this.isFillerTile(this.decIdx(idx, clueDirection))
+		) {
 			return true;
 		}
 		return (
