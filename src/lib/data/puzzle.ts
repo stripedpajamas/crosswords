@@ -95,6 +95,20 @@ export class Puzzle {
 		return value >= 'A' && value <= 'Z';
 	}
 
+	isFull(): boolean {
+		return this.state.every((_, i) => !this.isBlankTile(i));
+	}
+
+	getErrors(): Set<number> {
+		const errors = new Set<number>();
+		for (let i = 0; i < this.solution.length; i++) {
+			if (!this.isBlankTile(i) && this.solution[i] !== this.state[i]) {
+				errors.add(i);
+			}
+		}
+		return errors;
+	}
+
 	getInfo(): { title: string; author: string; copyright: string } {
 		return {
 			title: this.title,

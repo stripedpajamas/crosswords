@@ -4,6 +4,7 @@
 	export let filler: boolean;
 	export let blank: boolean;
 	export let value: string;
+	export let error: boolean;
 	export let ref: any = null;
 
 	let displayValue: string;
@@ -15,6 +16,7 @@
 	class:blank
 	class:selected
 	class:inSelectedWord
+	class:error
 	on:click
 	on:keyup
 	bind:this={ref}
@@ -36,17 +38,26 @@
 		&:hover:not(.filler) {
 			filter: brightness(90%);
 		}
-	}
 
-	.filler {
-		background-color: black;
-	}
+		&.filler {
+			background-color: black;
+		}
 
-	.inSelectedWord.selected {
-		background-color: rgba(135, 206, 250);
-	}
+		&.error {
+			background-color: rgba(255, 0, 0, 0.4);
+		}
 
-	.inSelectedWord {
-		background-color: rgba(135, 206, 250, 0.4);
+		&.inSelectedWord {
+			background-color: rgba(135, 206, 250, 0.4);
+			&.error {
+				background-color: rgba(255, 0, 0, 0.6);
+			}
+			&.selected {
+				background-color: rgba(135, 206, 250);
+				&.error {
+					background-color: rgba(255, 0, 0, 0.7);
+				}
+			}
+		}
 	}
 </style>

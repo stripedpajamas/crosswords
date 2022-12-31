@@ -9,7 +9,11 @@
 	export let selectTile: (tile: PuzzleTile) => void;
 	export let setTileValue: (tile: PuzzleTile, value: string) => void;
 	export let tileElements: HTMLButtonElement[];
+	export let showErrors: boolean;
 
+  let errors: Set<number>;
+  $: errors = puzzle.getErrors();
+  
 	function handleTileClick(tile: PuzzleTile): void {
 		return selectTile(tile);
 	}
@@ -69,6 +73,7 @@
 <div class="board">
 	{#each puzzle.grid as tile, idx}
 		<Tile
+      error={showErrors && errors.has(idx)}
 			value={puzzle.getState(idx)}
 			filler={tile.isFiller}
 			blank={puzzle.isBlankTile(idx)}

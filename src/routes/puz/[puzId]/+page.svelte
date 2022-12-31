@@ -2,11 +2,12 @@
 	import { Direction, type PuzzleTile } from '$lib/types';
 	import { onMount } from 'svelte';
 	import { Puzzle } from '$lib/data/puzzle';
-	import { Modals, closeModal } from 'svelte-modals';
+	import { Modals, closeModal, openModal } from 'svelte-modals';
 	import ClueList from '$lib/components/ClueList.svelte';
 	import ClueBar from '$lib/components/ClueBar.svelte';
 	import Board from '$lib/components/Board.svelte';
 	import CommandBar from '$lib/components/CommandBar.svelte';
+	import InfoModal from '$lib/components/InfoModal.svelte';
 	import type { PageServerData } from './$types';
 
 	export let data: PageServerData;
@@ -16,8 +17,17 @@
 	let selectedTile = puzzle.getStartOfFirstClue(clueDirection);
 	let tileElements: HTMLButtonElement[] = [];
 
+	let finished = false;
+  let showErrors = false;
 	let currentClue: { clue: string; idx: number } | null;
-	$: currentClue = puzzle.getClueForTile(selectedTile, clueDirection);
+	$: {
+		currentClue = puzzle.getClueForTile(selectedTile, clueDirection);
+
+		if (puzzle.isFull() && puzzle.checkPuzzle() && !finished) {
+			finished = true;
+			openModal(InfoModal, { title: 'Puzzle solved!', message: '' });
+		}
+	}
 
 	onMount(() => {
 		// so typing works without clicking anything on first load
@@ -73,8 +83,9 @@
 		puzzle = puzzle;
 	}
 
-	function checkPuzzle() {
-		return puzzle.checkPuzzle();
+	function handleShowErrors(): boolean {
+    showErrors = !showErrors;
+    return showErrors;
 	}
 </script>
 
@@ -88,8 +99,16 @@
 </Modals>
 <main style="--boardSize: {puzzle.width};">
 	<ClueBar {currentClue} />
-	<CommandBar {clearPuzzle} getInfo={() => puzzle.getInfo()} {checkPuzzle} />
-	<Board {puzzle} {clueDirection} {selectedTile} {tileElements} {selectTile} {setTileValue} />
+	<CommandBar {clearPuzzle} getInfo={() => puzzle.getInfo()} showErrors={handleShowErrors} />
+	<Board
+		{puzzle}
+		{clueDirection}
+		{selectedTile}
+		{tileElements}
+		{selectTile}
+		{setTileValue}
+		{showErrors}
+	/>
 	<ClueList {selectClue} clues={puzzle.clues} {currentClue} {clueDirection} />
 </main>
 
