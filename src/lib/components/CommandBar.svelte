@@ -3,6 +3,7 @@
 	import FaExclamationTriangle from 'svelte-icons/fa/FaExclamationTriangle.svelte';
 	import FaCheckDouble from 'svelte-icons/fa/FaCheckDouble.svelte';
 	import FaInfo from 'svelte-icons/fa/FaInfo.svelte';
+	import FaHome from 'svelte-icons/fa/FaHome.svelte';
 	import Modal from '$lib/components/InfoModal.svelte';
 
 	export let clearPuzzle: () => void;
@@ -32,6 +33,7 @@
 		><FaCheckDouble /></button
 	>
 	<button on:click={handleInfoClick} title="Puzzle info"><FaInfo /></button>
+	<a href="/"><button title="Home"><FaHome /></button></a>
 </div>
 
 <style lang="scss">
@@ -39,7 +41,7 @@
 		display: grid;
 		align-items: center;
 		justify-content: center;
-		grid-template-columns: repeat(3, min-content);
+		grid-template-columns: repeat(4, min-content);
 		column-gap: 1em;
 		button {
 			background-color: transparent;
