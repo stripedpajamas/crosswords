@@ -142,9 +142,31 @@ export class Puzzle {
 	}
 
 	getStartingTileForClue(clueDirection: Direction, clueIdx: number): PuzzleTile {
-		return this.grid.find(
+		const actualStartOfClue = this.grid.find(
 			(tile) => !tile.isFiller && tile.isStartOfWord && tile.clueIdx[clueDirection] === clueIdx
 		)!;
+
+		if (this.isBlankTile(actualStartOfClue.idx)) {
+			return actualStartOfClue;
+		}
+
+		let firstBlankTileOfClue = actualStartOfClue;
+		let inc = 1;
+		while (
+			firstBlankTileOfClue &&
+			!firstBlankTileOfClue.isFiller &&
+			!this.isBlankTile(firstBlankTileOfClue.idx)
+		) {
+			let nextIdx =
+				firstBlankTileOfClue.wordIdxs[clueDirection][
+					firstBlankTileOfClue.wordIdxs[clueDirection].findIndex(
+						(idx) => idx === firstBlankTileOfClue.idx
+					) + inc++
+				];
+			firstBlankTileOfClue = this.grid[nextIdx];
+		}
+
+		return firstBlankTileOfClue || actualStartOfClue;
 	}
 
 	getClueForTile(tile: PuzzleTile, clueDirection: Direction): { clue: string; idx: number } | null {
@@ -231,27 +253,43 @@ export class Puzzle {
 		return this.grid[prevIdx];
 	}
 
-	getNextTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {
+	getNextTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile | undefined {
 		if (currentTile.isFiller) {
 			throw new Error('unsupported to call getNextTile on a filler tile');
 		}
-		let nextIdx =
-			currentTile.wordIdxs[clueDirection][
-				currentTile.wordIdxs[clueDirection].findIndex((idx) => idx === currentTile.idx) + 1
-			];
-		if (nextIdx === undefined) {
-			// at end of current word
-			return this.getStartOfNextClueTile(currentTile, clueDirection);
+
+		let nextIdx: number;
+		let inc: number = 1;
+		do {
+			nextIdx =
+				currentTile.wordIdxs[clueDirection][
+					currentTile.wordIdxs[clueDirection].findIndex((idx) => idx === currentTile.idx) + inc++
+				];
+		} while (!this.isBlankTile(nextIdx) && nextIdx !== undefined);
+
+		if (!nextIdx) {
+			// at end of current word, so go to next clue
+			const nextClueStart = this.getStartOfNextClueTile(currentTile, clueDirection);
+			if (!nextClueStart) {
+				return;
+			}
+			if (this.isBlankTile(nextClueStart.idx)) {
+				return nextClueStart;
+			}
+			return this.getNextTile(nextClueStart, clueDirection);
 		}
 
 		return this.grid[nextIdx];
 	}
 
-	getStartOfNextClueTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {
+	getStartOfNextClueTile(
+		currentTile: PuzzleTile,
+		clueDirection: Direction
+	): PuzzleTile | undefined {
 		if (currentTile.isFiller) {
 			throw new Error('unsupported to call getStartOfNextClueTile on a filler tile');
 		}
-		const nextClueIdx = (currentTile.clueIdx[clueDirection] + 1) % this.clues[clueDirection].length;
+		const nextClueIdx = currentTile.clueIdx[clueDirection] + 1;
 
 		return this.grid.find((tile) => {
 			return (
@@ -259,7 +297,7 @@ export class Puzzle {
 				tile.isStartOfWord[clueDirection] &&
 				tile.clueIdx[clueDirection] === nextClueIdx
 			);
-		})!;
+		});
 	}
 
 	getEndOfPrevClueTile(currentTile: PuzzleTile, clueDirection: Direction): PuzzleTile {

@@ -18,7 +18,7 @@
 	let tileElements: HTMLButtonElement[] = [];
 
 	let finished = false;
-  let showErrors = false;
+	let showErrors = false;
 	let currentClue: { clue: string; idx: number } | null;
 	$: {
 		currentClue = puzzle.getClueForTile(selectedTile, clueDirection);
@@ -34,7 +34,13 @@
 		tileElements[selectedTile.idx].focus();
 	});
 
-	function selectTile(tile: PuzzleTile): void {
+	function selectTile(tile?: PuzzleTile): void {
+		if (!tile) {
+			toggleClueDirection();
+			selectedTile = puzzle.getStartOfFirstClue(clueDirection);
+			tileElements[selectedTile.idx].focus();
+			return;
+		}
 		if (tile.isFiller) {
 			tileElements[selectedTile.idx].focus();
 			return;
@@ -84,8 +90,8 @@
 	}
 
 	function handleShowErrors(): boolean {
-    showErrors = !showErrors;
-    return showErrors;
+		showErrors = !showErrors;
+		return showErrors;
 	}
 </script>
 
