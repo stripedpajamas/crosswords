@@ -66,6 +66,10 @@
 				}
 				break;
 			}
+			case 'TAB': {
+				selectTile(puzzle.getStartOfNextClueTile(tile, clueDirection))
+				break;
+			}
 		}
 	}
 </script>

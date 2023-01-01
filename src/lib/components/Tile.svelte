@@ -19,6 +19,7 @@
 	class:error
 	on:click
 	on:keyup
+	on:keydown|preventDefault|stopPropagation={e => e.key !== 'Tab'}
 	bind:this={ref}
 >
 	<p>{displayValue}</p>
