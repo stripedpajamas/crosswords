@@ -9,6 +9,15 @@
 
 	let displayValue: string;
 	$: displayValue = blank || filler ? ' ' : value;
+
+	function swallowTab(e: KeyboardEvent): boolean {
+		if (e.key === 'Tab') {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+		return true;
+	}
 </script>
 
 <button
@@ -19,7 +28,7 @@
 	class:error
 	on:click
 	on:keyup
-	on:keydown|preventDefault|stopPropagation={e => e.key !== 'Tab'}
+	on:keydown={swallowTab}
 	bind:this={ref}
 >
 	<p>{displayValue}</p>

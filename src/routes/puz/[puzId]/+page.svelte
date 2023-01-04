@@ -119,11 +119,12 @@
 </main>
 
 <style lang="scss">
+	$board-size: var(--boardSize);
 	main {
 		display: grid;
 		width: 100%;
-		grid-template-columns: calc(var(--boardSize) * 50px) 300px;
-		grid-template-rows: 50px calc(var(--boardSize) * 50px);
+		grid-template-columns: calc($board-size * 50px) 300px;
+		grid-template-rows: 50px calc($board-size * 50px);
 	}
 
 	.backdrop {

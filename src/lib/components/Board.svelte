@@ -91,12 +91,14 @@
 </div>
 
 <style lang="scss">
+	$board-size: var(--boardSize);
+
 	.board {
 		display: grid;
 		grid-column: 1 / 2;
 		grid-row: 2 / 3;
-		width: calc(var(--boardSize) * 50px);
-		grid-template-columns: repeat(var(--boardSize), 50px);
-		grid-template-rows: repeat(var(--boardSize), 50px);
+		width: calc($board-size * 50px);
+		grid-template-columns: repeat($board-size, 50px);
+		grid-template-rows: repeat($board-size, 50px);
 	}
 </style>
