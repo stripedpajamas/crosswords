@@ -123,8 +123,8 @@
 	main {
 		display: grid;
 		width: 100%;
-		grid-template-columns: calc($board-size * 50px) 300px;
-		grid-template-rows: 50px calc($board-size * 50px);
+		grid-template-columns: 1fr 300px;
+		grid-template-rows: 50px 1fr;
 	}
 
 	.backdrop {

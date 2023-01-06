@@ -55,7 +55,7 @@
 		grid-row: 2 / 4;
 		margin-left: 10px;
 		display: grid;
-		grid-template-rows: repeat(2, calc(var(--boardSize) * 50px / 2));
+		grid-template-rows: repeat(2, calc((100vh / 2) - 50px));
 
 		div {
 			overflow: hidden;

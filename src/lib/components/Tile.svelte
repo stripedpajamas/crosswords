@@ -36,13 +36,15 @@
 
 <style lang="scss">
 	button {
+		aspect-ratio: 1/1;
+		min-width: 18px;
 		border: 1px solid black;
 		display: grid;
 		justify-content: center;
 		align-content: center;
 		text-align: center;
 		width: 100%;
-		font-size: 24px;
+		font-size: 1em;
 		background-color: white;
 
 		&:hover:not(.filler) {

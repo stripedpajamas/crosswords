@@ -95,10 +95,11 @@
 
 	.board {
 		display: grid;
+		aspect-ratio: 1/1;
 		grid-column: 1 / 2;
 		grid-row: 2 / 3;
-		width: calc($board-size * 50px);
-		grid-template-columns: repeat($board-size, 50px);
-		grid-template-rows: repeat($board-size, 50px);
+		max-width: calc($board-size * 45px);
+		grid-template-columns: repeat($board-size, 1fr);
+		grid-template-rows: repeat($board-size, 1fr);
 	}
 </style>
