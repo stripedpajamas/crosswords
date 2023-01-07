@@ -43,6 +43,11 @@
 		justify-content: center;
 		grid-template-columns: repeat(4, min-content);
 		column-gap: 1em;
+
+		@media only screen and (max-width: 768px) {
+			padding-top: 2em;
+		}
+
 		button {
 			background-color: transparent;
 			border: none;

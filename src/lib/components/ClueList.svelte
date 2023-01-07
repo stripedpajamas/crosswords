@@ -51,6 +51,9 @@
 
 <style lang="scss">
 	.clue-list {
+		@media only screen and (max-width: 768px) {
+			display: none;
+		}
 		grid-column: 2 / 3;
 		grid-row: 2 / 4;
 		margin-left: 10px;

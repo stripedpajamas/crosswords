@@ -123,6 +123,9 @@
 	main {
 		display: grid;
 		width: 100%;
+		@media only screen and (max-width: 768px) {
+			grid-template-columns: 1fr;
+		}
 		grid-template-columns: 1fr 300px;
 		grid-template-rows: 50px 1fr;
 	}
