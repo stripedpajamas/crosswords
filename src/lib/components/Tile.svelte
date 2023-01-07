@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { Puzzle } from '$lib/data/puzzle';
+
 	export let selected: boolean;
 	export let inSelectedWord: boolean;
 	export let filler: boolean;
@@ -10,8 +12,22 @@
 	let displayValue: string;
 	$: displayValue = blank || filler ? ' ' : value;
 
-	function swallowTab(e: KeyboardEvent): boolean {
-		if (e.key === 'Tab') {
+	function shouldSwallow(e: KeyboardEvent): boolean {
+		// allow chords to act normally
+		if (e.metaKey || e.altKey || e.ctrlKey) {
+			return false;
+		}
+
+		// swallow valid puz input
+		if (Puzzle.isAlpha(e.key.toUpperCase()) || e.key === 'Tab') {
+			return true;
+		}
+
+		return false;
+	}
+
+	function swallow(e: KeyboardEvent): boolean {
+		if (shouldSwallow(e)) {
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -28,14 +44,16 @@
 	class:error
 	on:click
 	on:keyup
-	on:keydown={swallowTab}
+	on:keydown={swallow}
 	bind:this={ref}
+	contenteditable="true"
 >
 	<p>{displayValue}</p>
 </button>
 
 <style lang="scss">
 	button {
+		caret-color: transparent;
 		aspect-ratio: 1/1;
 		min-width: 18px;
 		border: 1px solid black;
