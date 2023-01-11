@@ -36,7 +36,7 @@
 	}
 </script>
 
-<button
+<input
 	class:filler
 	class:blank
 	class:selected
@@ -46,13 +46,11 @@
 	on:keyup
 	on:keydown={swallow}
 	bind:this={ref}
-	contenteditable="true"
+	bind:value={displayValue}
 >
-	<p>{displayValue}</p>
-</button>
 
 <style lang="scss">
-	button {
+	input {
 		caret-color: transparent;
 		aspect-ratio: 1/1;
 		min-width: 18px;
@@ -64,6 +62,11 @@
 		width: 100%;
 		font-size: 1em;
 		background-color: white;
+		caret-color: transparent;
+
+		&:focus {
+			outline: none;
+		}
 
 		&:hover:not(.filler) {
 			filter: brightness(90%);
